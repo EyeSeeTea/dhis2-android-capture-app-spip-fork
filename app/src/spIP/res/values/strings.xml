@@ -4,4 +4,7 @@
     <string name="logo_text">"Samaritan's Purse International Projects"</string>
     <string name="logo_number"></string>
     <string name="open_details">%s Registration Details</string>
+    <string name="send_sms">Send SMS</string>
+    <string name="sent_sms_successfully">The SMS was sent successfully</string>
+    <string name="sent_sms_error">There was an error sending the SMS</string>
 </resources>

@@ -37,6 +37,7 @@ import org.dhis2.usescases.enrollment.EnrollmentActivity
 import org.dhis2.usescases.enrollment.EnrollmentActivity.Companion.getIntent
 import org.dhis2.usescases.general.ActivityGlobalAbstract
 import org.dhis2.usescases.qrCodes.QrActivity
+import org.dhis2.usescases.sms.cmoProgram
 import org.dhis2.usescases.teiDashboard.adapters.DashboardPagerAdapter
 import org.dhis2.usescases.teiDashboard.adapters.DashboardPagerAdapter.Companion.NO_POSITION
 import org.dhis2.usescases.teiDashboard.adapters.DashboardPagerAdapter.DashboardPageType
@@ -577,6 +578,11 @@ class TeiDashboardMobileActivity :
                     }
                     if (dashboardViewModel.showFollowUpBar.value) {
                         popupMenu.menu.findItem(R.id.markForFollowUp).isVisible = false
+                    }
+
+                    //EyeSeeTea customization
+                    if (presenter.programUid != cmoProgram ){
+                        popupMenu.menu.findItem(R.id.share).isVisible = false
                     }
                 }
                 Unit
