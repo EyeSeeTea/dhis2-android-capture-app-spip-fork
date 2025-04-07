@@ -197,6 +197,17 @@ class TeiDashboardMobileActivity :
                 updateStatus()
             }
         }
+
+        //EyeSeeTea customization - Send SMS
+        val sendSMS = intent.getBooleanExtra(Constants.SEND_SMS,false)
+
+        if(sendSMS && teiUid != null){
+                sendSms(
+                    this,
+                    binding.root,
+                    teiUid!!,
+                )
+        }
     }
 
     private fun setEditButton() {
