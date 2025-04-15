@@ -1,19 +1,28 @@
 package org.dhis2.usescases.sms.domain
 
 import org.dhis2.usescases.sms.domain.message.Message
+import org.dhis2.usescases.sms.domain.message.MessageTemplate
 import org.dhis2.usescases.sms.domain.message.MessageTemplateRepository
 import org.dhis2.usescases.sms.domain.message.SmsRepository
 import org.dhis2.usescases.sms.domain.patient.PatientRepository
+
+sealed class SmsResult{
+    data object Success:SmsResult()
+    data class SuccessUsingEn(val preferredLanguage: String):SmsResult()
+    data object TemplateFailure:SmsResult()
+    data object SendFailure:SmsResult()
+}
 
 class SendSmsUseCase(
     private val patientRepository: PatientRepository,
     private val smsTemplateRepository: MessageTemplateRepository,
     private val smsRepository: SmsRepository
 ) {
-    fun invoke(uid: String) {
+    fun invoke(uid: String):SmsResult{
         val patient = patientRepository.getByUid(uid)
 
-        val messageTemplate = smsTemplateRepository.getByLanguage(patient.preferredLanguage)
+        val messageTemplate = getMessageTemplate(patient.preferredLanguage)
+            ?: return SmsResult.TemplateFailure
 
         val message = Message(
             text = messageTemplate.text
@@ -22,7 +31,34 @@ class SendSmsUseCase(
             recipients = listOf(cleanupPhoneNumber(patient.phone))
         )
 
-        smsRepository.send(message)
+        try {
+            smsRepository.send(message)
+
+            return if (patient.preferredLanguage != "en" && messageTemplate.language == "en") {
+                SmsResult.SuccessUsingEn(patient.preferredLanguage)
+            } else {
+                SmsResult.Success
+            }
+        } catch (e: Exception) {
+            return SmsResult.SendFailure
+        }
+
+    }
+
+    private fun getMessageTemplate(language: String): MessageTemplate? {
+        val messageTemplate = smsTemplateRepository.getByLanguage(language)
+
+        return if (messageTemplate.isSome()) {
+            messageTemplate.getOrThrow()
+        } else {
+            val defaultMessageTemplate = smsTemplateRepository.getByLanguage("en")
+
+            if (defaultMessageTemplate.isSome()) {
+                defaultMessageTemplate.getOrThrow()
+            } else {
+                return null
+            }
+        }
     }
 
     private fun cleanupPhoneNumber(phoneNumber: String): String {

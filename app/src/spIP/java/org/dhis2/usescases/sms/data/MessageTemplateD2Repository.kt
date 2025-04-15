@@ -3,16 +3,17 @@ package org.dhis2.usescases.sms.data
 import org.dhis2.usescases.sms.data.api.ConstantApi
 import org.dhis2.usescases.sms.domain.message.MessageTemplate
 import org.dhis2.usescases.sms.domain.message.MessageTemplateRepository
+import org.dhis2.usescases.sms.domain.types.Maybe
 import org.hisp.dhis.android.core.D2
 
 class MessageTemplateD2Repository (private val d2: D2, private val constantApi: ConstantApi) : MessageTemplateRepository {
-    override fun getByLanguage(language: String): MessageTemplate {
+    override fun getByLanguage(language: String): Maybe<MessageTemplate> {
         val templateConstants = d2.constantModule().constants().byName()
             .eq("CMO_ENROLLMENT_TEMPLATE_$language")
             .blockingGet()
 
         if (templateConstants.isEmpty()){
-            throw IllegalArgumentException("No template found for language: $language")
+            return Maybe.None
         }
 
         val templateConstant = templateConstants.first()
@@ -20,12 +21,13 @@ class MessageTemplateD2Repository (private val d2: D2, private val constantApi: 
         val description = getDescriptionConstant(templateConstant.uid())
 
         if (description.isEmpty()){
-            throw IllegalArgumentException("No description found for template: ${templateConstant.uid()}")
+            return Maybe.None
         }
 
-        return MessageTemplate(
-            text = description
-        )
+        return Maybe.Some( MessageTemplate(
+            text = description,
+            language = language
+        ))
     }
 
     private fun getDescriptionConstant(uid:String):String{
