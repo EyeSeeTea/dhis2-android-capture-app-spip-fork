@@ -32,6 +32,7 @@ class SendSmsUseCaseTest {
             "John Doe",
             "1234567890",
             "1234567890",
+            "en",
             "Hello {{fullName}}, your patient number is {{patientNumber}}"
         )
 
@@ -49,6 +50,7 @@ class SendSmsUseCaseTest {
         patientName: String,
         patientNumber: String,
         phone: String,
+        language: String,
         messageTemplate: String
     ): SendSmsUseCase {
 
@@ -65,7 +67,7 @@ class SendSmsUseCaseTest {
         )
 
         whenever(
-            messageTemplateRepository.getByLanguage(any())
+            messageTemplateRepository.getByLanguage(language)
         ).thenReturn(MessageTemplate(text = messageTemplate))
 
         return SendSmsUseCase(
