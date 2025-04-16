@@ -199,6 +199,9 @@ class TeiDashboardMobileActivity :
         }
 
         //EyeSeeTea customization - Send SMS
+        // Commented automatic send sms to create TEI because
+        // the client wants to send it manually for the moment
+        // we leave all infrastructure to send automatically
     /*    val sendSMS = intent.getBooleanExtra(Constants.SEND_SMS,false)
 
         if(sendSMS && teiUid != null){
