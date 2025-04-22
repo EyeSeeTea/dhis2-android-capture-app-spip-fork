@@ -5,6 +5,7 @@ import org.dhis2.usescases.sms.domain.message.MessageTemplate
 import org.dhis2.usescases.sms.domain.message.MessageTemplateRepository
 import org.dhis2.usescases.sms.domain.message.SmsRepository
 import org.dhis2.usescases.sms.domain.patient.PatientRepository
+import org.dhis2.usescases.sms.domain.patient.PreferredLanguageRepository
 
 sealed class SmsResult{
     data object Success:SmsResult()
@@ -16,6 +17,7 @@ sealed class SmsResult{
 class SendSmsUseCase(
     private val patientRepository: PatientRepository,
     private val smsTemplateRepository: MessageTemplateRepository,
+    private val preferredLanguageRepository: PreferredLanguageRepository,
     private val smsRepository: SmsRepository
 ) {
     fun invoke(uid: String):SmsResult{
@@ -35,7 +37,9 @@ class SendSmsUseCase(
             smsRepository.send(message)
 
             return if (patient.preferredLanguage != "en" && messageTemplate.language == "en") {
-                SmsResult.SuccessUsingEn(patient.preferredLanguage)
+                val language = preferredLanguageRepository.getByCode(patient.preferredLanguage)
+
+                SmsResult.SuccessUsingEn(language.name)
             } else {
                 SmsResult.Success
             }

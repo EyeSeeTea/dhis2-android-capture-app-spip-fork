@@ -2,6 +2,7 @@ package org.dhis2.usescases.sms.di
 
 import org.dhis2.usescases.sms.data.MessageTemplateD2Repository
 import org.dhis2.usescases.sms.data.PatientD2Repository
+import org.dhis2.usescases.sms.data.PreferredLanguageD2Repository
 import org.dhis2.usescases.sms.data.SmsApiRepository
 import org.dhis2.usescases.sms.data.api.ConstantApi
 import org.dhis2.usescases.sms.data.api.OutboundApi
@@ -22,11 +23,13 @@ object ServiceLocator {
 
         val patientRepository = PatientD2Repository(d2)
         val messageTemplate = MessageTemplateD2Repository(d2, constantApi)
+        val preferredLanguageRepository = PreferredLanguageD2Repository(d2)
         val smsRepository = SmsApiRepository(outboundApi)
 
         return SendSmsUseCase(
             patientRepository,
             messageTemplate,
+            preferredLanguageRepository,
             smsRepository
         )
     }

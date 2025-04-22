@@ -1,6 +1,7 @@
 package org.dhis2.usescases.teiDashboard
 
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -84,10 +85,14 @@ fun showCustomSnackbar(
     val snackbar = Snackbar.make(parentView, message, Snackbar.LENGTH_SHORT)
 
     val color =
-        if (isSuccess) ContextCompat.getColor(activity, R.color.colorPrimaryDark_2e7) // Verde
-        else ContextCompat.getColor(activity, R.color.colorPrimaryDarkRed) // Rojo
+        if (isSuccess) ContextCompat.getColor(activity, R.color.colorPrimaryDark_2e7)
+        else ContextCompat.getColor(activity, R.color.colorPrimaryDarkRed)
 
     snackbar.setBackgroundTint(color)
+
+    snackbar.view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)?.apply {
+        maxLines = Int.MAX_VALUE
+    }
 
     snackbar.show()
 }
