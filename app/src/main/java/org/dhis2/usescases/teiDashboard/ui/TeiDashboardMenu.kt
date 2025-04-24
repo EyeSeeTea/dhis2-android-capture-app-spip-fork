@@ -63,7 +63,6 @@ private fun buildMenuForEnrollment(
         addFollowUpMenuItem(dashboardViewModel, resourceManager)
         addTimelineOrGroupByStageMenuItem(dashboardViewModel, resourceManager)
         addHelpMenuItem(resourceManager)
-        addSendSmsMenuItem(resourceManager)
         addMoreEnrollmentsMenuItem(resourceManager)
         addShareMenuItem(resourceManager)
         addStatusMenuItems(enrollmentUid, resourceManager, presenter)
@@ -71,6 +70,7 @@ private fun buildMenuForEnrollment(
         addDeleteTeiMenuItem(presenter, resourceManager)
     }
 }
+
 private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addSyncMenuItem(
     resourceManager: ResourceManager,
 ) {
@@ -209,13 +209,11 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addStatusMenuItems(
     }
 
     if (status != EnrollmentStatus.CANCELLED) {
-        // If this is not the last element we should avoid showing the divider
-        val isDividerVisible = presenter.checkIfEnrollmentCanBeDeleted(enrollmentUid) || presenter.checkIfTEICanBeDeleted()
         add(
             MenuItemData(
                 id = EnrollmentMenuItem.DEACTIVATE,
                 label = resourceManager.getString(R.string.deactivate),
-                showDivider = isDividerVisible,
+                showDivider = true,
                 leadingElement = MenuLeadingElement.Icon(
                     icon = Icons.Outlined.Cancel,
                     defaultTintColor = TextColor.OnDisabledSurface,
