@@ -877,5 +877,6 @@ enum class EnrollmentMenuItem {
     DEACTIVATE,
     COMPLETE,
     DELETE,
-    REMOVE
+    REMOVE,
+    SEND_SMS,
 }
