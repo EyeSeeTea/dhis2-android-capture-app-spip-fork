@@ -11,7 +11,6 @@ import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.LockReset
 import androidx.compose.material.icons.outlined.MoveDown
 import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material.icons.outlined.Sms
 import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.Workspaces
@@ -20,7 +19,6 @@ import org.dhis2.commons.resources.ResourceManager
 import org.dhis2.usescases.teiDashboard.DashboardEnrollmentModel
 import org.dhis2.usescases.teiDashboard.DashboardViewModel
 import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem
-import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.SEND_SMS
 import org.dhis2.usescases.teiDashboard.TeiDashboardContracts
 import org.hisp.dhis.android.core.enrollment.EnrollmentStatus
 import org.hisp.dhis.mobile.ui.designsystem.component.menu.MenuItemData
@@ -75,6 +73,7 @@ private fun buildMenuForEnrollment(
         addDeleteTeiMenuItem(presenter, resourceManager)
     }
 }
+
 private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addSyncMenuItem(
     resourceManager: ResourceManager,
 ) {
@@ -213,13 +212,11 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addStatusMenuItems(
     }
 
     if (status != EnrollmentStatus.CANCELLED) {
-        // If this is not the last element we should avoid showing the divider
-        val isDividerVisible = presenter.checkIfEnrollmentCanBeDeleted(enrollmentUid) || presenter.checkIfTEICanBeDeleted()
         add(
             MenuItemData(
                 id = EnrollmentMenuItem.DEACTIVATE,
                 label = resourceManager.getString(R.string.deactivate),
-                showDivider = isDividerVisible,
+                showDivider = true,
                 leadingElement = MenuLeadingElement.Icon(
                     icon = Icons.Outlined.Cancel,
                     defaultTintColor = TextColor.OnDisabledSurface,
