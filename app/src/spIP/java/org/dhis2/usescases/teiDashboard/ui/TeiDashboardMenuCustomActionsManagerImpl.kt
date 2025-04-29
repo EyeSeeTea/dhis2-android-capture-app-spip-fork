@@ -18,7 +18,7 @@ import javax.inject.Inject
 class TeiDashboardMenuCustomActionsManagerImpl @Inject constructor(
   private val dispatcher: DispatcherProvider,
   private val sendSmsUseCase: SendSmsUseCase,
-  private val spipSmsContentResourcesProvider: SpipSmsContentResourcesProvider,
+  private val contentResourcesProvider: SpipSmsContentResourcesProvider,
 ) : TeiDashboardMenuCustomActionsManager, CoroutineScope {
 
   private val job = Job()
@@ -35,10 +35,10 @@ class TeiDashboardMenuCustomActionsManagerImpl @Inject constructor(
     launch {
       val result = teiUid?.let { sendSmsUseCase.invoke(it) } ?: SmsResult.TemplateFailure
       val message = when (result) {
-        is SmsResult.Success -> spipSmsContentResourcesProvider.onSmsSentSuccessfully()
-        is SmsResult.SuccessUsingEn -> spipSmsContentResourcesProvider.onSmsSentEnSuccessfully()
-        is SmsResult.TemplateFailure -> spipSmsContentResourcesProvider.onSmsSentGenericError()
-        is SmsResult.SendFailure -> spipSmsContentResourcesProvider.onSmsSentError()
+        is SmsResult.Success -> contentResourcesProvider.onSmsSentSuccessfully()
+        is SmsResult.SuccessUsingEn -> contentResourcesProvider.onSmsSentEnSuccessfully()
+        is SmsResult.TemplateFailure -> contentResourcesProvider.onSmsSentGenericError()
+        is SmsResult.SendFailure -> contentResourcesProvider.onSmsSentError()
       }
       showCustomSnackBar(
         message = message,
@@ -55,7 +55,7 @@ class TeiDashboardMenuCustomActionsManagerImpl @Inject constructor(
   ) {
     withContext(dispatcher.ui()) {
       Snackbar.make(parentView, message, Snackbar.LENGTH_SHORT).apply {
-        val color = spipSmsContentResourcesProvider.getOnMessageBackground(isSuccess)
+        val color = contentResourcesProvider.getOnMessageBackground(isSuccess)
         setBackgroundTint(color)
         view.findViewById<TextView>(R.id.snackbar_text)?.apply {
           maxLines = Int.MAX_VALUE
