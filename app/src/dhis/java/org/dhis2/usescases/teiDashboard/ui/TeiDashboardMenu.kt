@@ -1,4 +1,3 @@
-
 package org.dhis2.usescases.teiDashboard.ui
 
 import androidx.compose.material.icons.Icons
@@ -27,7 +26,6 @@ import org.hisp.dhis.mobile.ui.designsystem.component.menu.MenuItemStyle
 import org.hisp.dhis.mobile.ui.designsystem.component.menu.MenuLeadingElement
 import org.hisp.dhis.mobile.ui.designsystem.theme.SurfaceColor
 import org.hisp.dhis.mobile.ui.designsystem.theme.TextColor
-
 
 fun getEnrollmentMenuList(
     enrollmentUid: String?,
