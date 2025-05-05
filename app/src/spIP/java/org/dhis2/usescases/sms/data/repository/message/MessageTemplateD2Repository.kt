@@ -7,7 +7,7 @@ import org.dhis2.usescases.sms.domain.repository.message.MessageTemplateReposito
 import org.hisp.dhis.android.core.D2
 import javax.inject.Inject
 
-class MessageTemplateD2Repository @Inject constructor(
+class MessageTemplateD2Repository(
   private val constantApi: ConstantApi,
   private val d2: D2,
 ) : MessageTemplateRepository {

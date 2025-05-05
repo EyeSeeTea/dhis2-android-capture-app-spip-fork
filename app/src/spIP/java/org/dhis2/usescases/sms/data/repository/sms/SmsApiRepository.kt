@@ -7,7 +7,7 @@ import org.dhis2.usescases.sms.domain.model.sms.Message
 import org.dhis2.usescases.sms.domain.repository.sms.SmsRepository
 import javax.inject.Inject
 
-class SmsApiRepository @Inject constructor(
+class SmsApiRepository(
   private val outboundApi: OutboundApi
 ) : SmsRepository {
 

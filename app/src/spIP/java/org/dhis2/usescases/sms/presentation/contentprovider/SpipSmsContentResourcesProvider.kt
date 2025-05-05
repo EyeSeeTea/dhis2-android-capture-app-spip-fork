@@ -17,8 +17,8 @@ class SpipSmsContentResourcesProvider(
 
   @SuppressLint("ResourceType") fun getOnMessageBackground(
     isSuccess: Boolean
-  ) =
-    if (isSuccess) provideColorMessage(R.color.colorPrimaryDark_2e7) else provideColorMessage(R.color.colorPrimaryDarkRed)
+  ) = if (isSuccess) provideColorMessage(R.color.colorPrimaryDark_2e7)
+  else provideColorMessage(R.color.colorPrimaryDarkRed)
 
   private fun provideStringMessage(@StringRes message: Int): String {
     return context.getString(message)

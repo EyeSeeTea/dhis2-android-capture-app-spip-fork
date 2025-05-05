@@ -18,7 +18,7 @@ interface ConstantApi {
   ): D2Constant
 }
 
-class ConstantApiImpl @Inject constructor(
+class ConstantApiImpl(
   private val client: HttpServiceClient
 ) : ConstantApi{
 

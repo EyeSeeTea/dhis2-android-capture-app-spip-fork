@@ -1,8 +1,7 @@
 package org.dhis2.usescases.sms.DI
 
 import android.content.Context
-import kotlinx.coroutines.Dispatchers
-import org.dhis2.commons.viewmodel.DispatcherProvider
+import org.dhis2.usescases.di.SpipSmsDispatcherProvider
 import org.dhis2.usescases.sms.data.api.ConstantApi
 import org.dhis2.usescases.sms.data.api.ConstantApiImpl
 import org.dhis2.usescases.sms.data.api.OutboundApi
@@ -15,20 +14,28 @@ import org.dhis2.usescases.sms.domain.usecase.SendSmsUseCase
 import org.dhis2.usescases.sms.presentation.contentprovider.SpipSmsContentResourcesProvider
 import org.dhis2.usescases.teiDashboard.TeiDashboardMenuCustomActionsManager
 import org.dhis2.usescases.teiDashboard.ui.TeiDashboardMenuCustomActionsManagerImpl
+import org.hisp.dhis.android.core.D2
 import org.hisp.dhis.android.core.D2Manager
+import org.hisp.dhis.android.core.arch.api.HttpServiceClient
 
 object SPIPServiceLocator {
 
+  private fun provideD2(): D2 {
+    return D2Manager.getD2()
+  }
+
+  private fun provideHttpClient(): HttpServiceClient {
+    return D2Manager.getD2().httpServiceClient()
+  }
+
   private fun provideSendSmsUseCase(): SendSmsUseCase {
-    val d2 = D2Manager.getD2()
-    val httpClient = d2.httpServiceClient()
 
-    val outboundApi: OutboundApi = OutboundApiImpl(httpClient)
-    val constantApi: ConstantApi = ConstantApiImpl(httpClient)
+    val outboundApi: OutboundApi = OutboundApiImpl(provideHttpClient())
+    val constantApi: ConstantApi = ConstantApiImpl(provideHttpClient())
 
-    val patientRepository = PatientD2Repository(d2)
-    val messageTemplate = MessageTemplateD2Repository(constantApi, d2)
-    val preferredLanguageRepository = PreferredLanguageD2Repository(d2)
+    val patientRepository = PatientD2Repository(provideD2())
+    val messageTemplate = MessageTemplateD2Repository(constantApi, provideD2())
+    val preferredLanguageRepository = PreferredLanguageD2Repository(provideD2())
     val smsRepository = SmsApiRepository(outboundApi)
 
     return SendSmsUseCase(
@@ -49,15 +56,12 @@ object SPIPServiceLocator {
     context: Context
   ): TeiDashboardMenuCustomActionsManager {
     return TeiDashboardMenuCustomActionsManagerImpl(
-      dispatcher = provideDispatcher(),
+      dispatcher = provideDispatcherProvider(),
       sendSmsUseCase = provideSendSmsUseCase(),
       contentResourcesProvider = provideSpipSmsContentResourcesProvider(context)
     )
   }
 
-  private fun provideDispatcher() = object : DispatcherProvider {
-    override fun io() = Dispatchers.IO
-    override fun computation() = Dispatchers.Unconfined
-    override fun ui() = Dispatchers.Main
-  }
+  private fun provideDispatcherProvider() = SpipSmsDispatcherProvider()
+
 }
