@@ -1,4 +1,4 @@
-package org.dhis2.usescases.teiDashboard.ui
+package org.dhis2.usescases.sms.presentation.menu
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Sms
@@ -10,15 +10,15 @@ import org.hisp.dhis.mobile.ui.designsystem.component.menu.MenuItemData
 import org.hisp.dhis.mobile.ui.designsystem.component.menu.MenuLeadingElement
 
 fun MutableList<MenuItemData<EnrollmentMenuItem>>.addSendSmsMenuItem(
-    isMenuOptionAvailable : Boolean,
-    resourceManager: ResourceManager
+  isMenuOptionAvailable: Boolean,
+  resourceManager: ResourceManager
 ) {
-    if(!isMenuOptionAvailable) return
-    add(
-        MenuItemData(
-            id = SEND_SMS,
-            label = resourceManager.getString(R.string.send_sms),
-            leadingElement = MenuLeadingElement.Icon(icon = Icons.Outlined.Sms),
-        ),
-    )
+  if (!isMenuOptionAvailable) return
+  add(
+    MenuItemData(
+      id = SEND_SMS,
+      label = resourceManager.getString(R.string.send_sms),
+      leadingElement = MenuLeadingElement.Icon(icon = Icons.Outlined.Sms),
+    ),
+  )
 }

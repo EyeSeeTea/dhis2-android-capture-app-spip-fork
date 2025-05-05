@@ -18,6 +18,7 @@ class TeiDashboardMenuCustomActionsManagerImpl(
   private val dispatcher: DispatcherProvider,
   private val sendSmsUseCase: SendSmsUseCase,
   private val contentResourcesProvider: SpipSmsContentResourcesProvider,
+  private val snackbarDisplayer: SnackbarDisplayer,
 ) : TeiDashboardMenuCustomActionsManager, CoroutineScope {
 
   private val job = Job()
@@ -53,13 +54,11 @@ class TeiDashboardMenuCustomActionsManagerImpl(
     parentView: View,
   ) {
     withContext(dispatcher.ui()) {
-      Snackbar.make(parentView, message, Snackbar.LENGTH_SHORT).apply {
-        val color = contentResourcesProvider.getOnMessageBackground(isSuccess)
-        setBackgroundTint(color)
-        view.findViewById<TextView>(R.id.snackbar_text)?.apply {
-          maxLines = Int.MAX_VALUE
-        }
-      }.show()
+      snackbarDisplayer.showCustomSnackBar(
+        message = message,
+        isSuccess = isSuccess,
+        parentView = parentView
+      )
     }
   }
 

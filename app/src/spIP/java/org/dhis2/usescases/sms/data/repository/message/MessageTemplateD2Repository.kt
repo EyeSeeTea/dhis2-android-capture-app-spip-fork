@@ -5,7 +5,6 @@ import org.dhis2.usescases.sms.data.model.D2Constant
 import org.dhis2.usescases.sms.data.model.MessageTemplate
 import org.dhis2.usescases.sms.domain.repository.message.MessageTemplateRepository
 import org.hisp.dhis.android.core.D2
-import javax.inject.Inject
 
 class MessageTemplateD2Repository(
   private val constantApi: ConstantApi,

@@ -13,6 +13,8 @@ import org.dhis2.usescases.sms.data.repository.sms.SmsApiRepository
 import org.dhis2.usescases.sms.domain.usecase.SendSmsUseCase
 import org.dhis2.usescases.sms.presentation.contentprovider.SpipSmsContentResourcesProvider
 import org.dhis2.usescases.teiDashboard.TeiDashboardMenuCustomActionsManager
+import org.dhis2.usescases.teiDashboard.ui.SnackbarDisplayer
+import org.dhis2.usescases.teiDashboard.ui.SnackbarDisplayerImpl
 import org.dhis2.usescases.teiDashboard.ui.TeiDashboardMenuCustomActionsManagerImpl
 import org.hisp.dhis.android.core.D2
 import org.hisp.dhis.android.core.D2Manager
@@ -52,13 +54,20 @@ object SPIPServiceLocator {
     return SpipSmsContentResourcesProvider(context)
   }
 
+  private fun provideSnackbarDisplayer(
+    contentResourcesProvider: SpipSmsContentResourcesProvider,
+  ): SnackbarDisplayer {
+    return SnackbarDisplayerImpl(contentResourcesProvider)
+  }
+
   fun provideTeiDashboardMenuCustomActionsManager(
     context: Context
   ): TeiDashboardMenuCustomActionsManager {
     return TeiDashboardMenuCustomActionsManagerImpl(
       dispatcher = provideDispatcherProvider(),
       sendSmsUseCase = provideSendSmsUseCase(),
-      contentResourcesProvider = provideSpipSmsContentResourcesProvider(context)
+      contentResourcesProvider = provideSpipSmsContentResourcesProvider(context),
+      snackbarDisplayer = provideSnackbarDisplayer(provideSpipSmsContentResourcesProvider(context))
     )
   }
 
