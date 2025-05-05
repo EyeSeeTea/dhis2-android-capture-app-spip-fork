@@ -73,14 +73,14 @@ private fun buildMenuForEnrollment(
     dashboardViewModel: DashboardViewModel,
 ): List<MenuItemData<EnrollmentMenuItem>> {
     return buildList {
+        if (presenter.isCmoProgram) {
+            addSendSmsMenuItem(resourceManager) // New Menu Item
+        }
         addSyncMenuItem(resourceManager)
         addIfTeiCanBeTransferred(dashboardViewModel, resourceManager)
         addFollowUpMenuItem(dashboardViewModel, resourceManager)
         addTimelineOrGroupByStageMenuItem(dashboardViewModel, resourceManager)
         addHelpMenuItem(resourceManager)
-        if (presenter.isCmoProgram) {
-            addSendSmsMenuItem(resourceManager) // New Menu Item
-        }
         addMoreEnrollmentsMenuItem(resourceManager)
         addShareMenuItem(resourceManager)
         addStatusMenuItems(enrollmentUid, resourceManager, presenter)
