@@ -21,12 +21,12 @@ class MessageTemplateD2Repository(
         .blockingGet()
         .firstOrNull() ?: throw Exception("No template constants found")
 
-      val constant = getDescriptionConstant(templateConstants.uid()).getOrThrow()
-      if (constant.description.isEmpty()) {
+      val description = getDescriptionConstant(templateConstants.uid())
+      if (description.isEmpty()) {
         throw Exception("Template description is empty")
       }
       MessageTemplate(
-        text = constant.description,
+        text = description,
         language = language
       )
     }
@@ -38,12 +38,12 @@ class MessageTemplateD2Repository(
    * @param uid The UID of the constant to retrieve.
    * @return The description of the constant, or an empty string if not found.
    */
-  private suspend fun getDescriptionConstant(uid: String): Result<D2Constant> {
+  private suspend fun getDescriptionConstant(uid: String): String {
     return try {
       val body = constantApi.getConstant(uid)
-      return Result.success(body)
-    }catch (e: Exception) {
-      Result.failure(Exception("Error retrieving constant description: ${e.message}"))
+      body.description
+    } catch (e: Exception) {
+      ""
     }
   }
 

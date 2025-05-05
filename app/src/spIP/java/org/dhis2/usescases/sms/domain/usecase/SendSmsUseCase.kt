@@ -60,10 +60,18 @@ class SendSmsUseCase(
    * @return The message template for the specified language, or null if not found.
    */
   private suspend fun getMessageTemplate(language: String): MessageTemplate? {
-    smsTemplateRepository.getByLanguage(language).takeIf { it.isSuccess }?.let {
-      return it.getOrThrow()
+    val messageTemplate = smsTemplateRepository.getByLanguage(language)
+    return if (messageTemplate.isSuccess) {
+      messageTemplate.getOrThrow()
+    } else {
+      val defaultMessageTemplate = smsTemplateRepository.getByLanguage(LANGUAGE_EN)
+
+      if (defaultMessageTemplate.isSuccess) {
+        defaultMessageTemplate.getOrThrow()
+      } else {
+        return null
+      }
     }
-    return smsTemplateRepository.getByLanguage(LANGUAGE_EN).takeIf { it.isSuccess }?.getOrThrow()
   }
 
   /**
