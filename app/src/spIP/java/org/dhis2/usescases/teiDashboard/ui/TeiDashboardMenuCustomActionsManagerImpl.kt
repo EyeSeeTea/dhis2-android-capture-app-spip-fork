@@ -1,13 +1,10 @@
 package org.dhis2.usescases.teiDashboard.ui
 
 import android.view.View
-import android.widget.TextView
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.dhis2.R
 import org.dhis2.commons.viewmodel.DispatcherProvider
 import org.dhis2.usescases.sms.domain.model.sms.SmsResult
 import org.dhis2.usescases.sms.domain.usecase.SendSmsUseCase
