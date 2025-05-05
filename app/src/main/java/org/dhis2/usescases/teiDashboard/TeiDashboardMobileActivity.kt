@@ -68,7 +68,6 @@ import org.dhis2.usescases.teiDashboard.dashboardfragments.teidata.TEIDataActivi
 import org.dhis2.usescases.teiDashboard.dashboardfragments.teidata.TEIDataFragment.Companion.newInstance
 import org.dhis2.usescases.teiDashboard.teiProgramList.TeiProgramListActivity
 import org.dhis2.usescases.teiDashboard.ui.RelationshipTopBarIcon
-import org.dhis2.usescases.teiDashboard.ui.getEnrollmentMenuList
 import org.dhis2.usescases.teiDashboard.ui.setButtonContent
 import org.dhis2.utils.HelpManager
 import org.dhis2.utils.analytics.CLICK

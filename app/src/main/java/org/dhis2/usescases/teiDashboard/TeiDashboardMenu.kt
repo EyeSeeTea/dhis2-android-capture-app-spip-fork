@@ -1,4 +1,4 @@
-package org.dhis2.usescases.teiDashboard.ui
+package org.dhis2.usescases.teiDashboard
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Assignment
@@ -16,10 +16,21 @@ import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.Workspaces
 import org.dhis2.R
 import org.dhis2.commons.resources.ResourceManager
-import org.dhis2.usescases.teiDashboard.DashboardEnrollmentModel
-import org.dhis2.usescases.teiDashboard.DashboardViewModel
-import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem
-import org.dhis2.usescases.teiDashboard.TeiDashboardContracts
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.ACTIVATE
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.COMPLETE
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.DEACTIVATE
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.DELETE
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.ENROLLMENTS
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.FOLLOW_UP
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.GROUP_BY_STAGE
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.HELP
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.REMOVE
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.SHARE
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.SYNC
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.TRANSFER
+import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem.VIEW_TIMELINE
+import org.dhis2.usescases.teiDashboard.TeiDashboardContracts.Presenter
+import org.dhis2.usescases.teiDashboard.ui.addSendSmsMenuItem
 import org.hisp.dhis.android.core.enrollment.EnrollmentStatus
 import org.hisp.dhis.mobile.ui.designsystem.component.menu.MenuItemData
 import org.hisp.dhis.mobile.ui.designsystem.component.menu.MenuItemStyle
@@ -30,7 +41,7 @@ import org.hisp.dhis.mobile.ui.designsystem.theme.TextColor
 fun getEnrollmentMenuList(
     enrollmentUid: String?,
     resourceManager: ResourceManager,
-    presenter: TeiDashboardContracts.Presenter,
+    presenter: Presenter,
     dashboardViewModel: DashboardViewModel,
 ): List<MenuItemData<EnrollmentMenuItem>> {
     return if (enrollmentUid == null) {
@@ -42,7 +53,7 @@ fun getEnrollmentMenuList(
 
 private fun buildMenuForNoEnrollment(
     resourceManager: ResourceManager,
-    presenter: TeiDashboardContracts.Presenter,
+    presenter: Presenter,
 ): List<MenuItemData<EnrollmentMenuItem>> {
     return buildList {
         addSyncMenuItem(resourceManager)
@@ -54,10 +65,16 @@ private fun buildMenuForNoEnrollment(
 private fun buildMenuForEnrollment(
     enrollmentUid: String,
     resourceManager: ResourceManager,
-    presenter: TeiDashboardContracts.Presenter,
+    presenter: Presenter,
     dashboardViewModel: DashboardViewModel,
 ): List<MenuItemData<EnrollmentMenuItem>> {
     return buildList {
+        //EyeSeeTea customization - Send SMS
+        addSendSmsMenuItem(
+            isMenuOptionAvailable = presenter.isCmoProgram,
+            resourceManager = resourceManager
+        )
+        //
         addSyncMenuItem(resourceManager)
         addIfTeiCanBeTransferred(dashboardViewModel, resourceManager)
         addFollowUpMenuItem(dashboardViewModel, resourceManager)
@@ -76,7 +93,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addSyncMenuItem(
 ) {
     add(
         MenuItemData(
-            id = EnrollmentMenuItem.SYNC,
+            id = SYNC,
             label = resourceManager.getString(R.string.refresh_this_record),
             leadingElement = MenuLeadingElement.Icon(icon = Icons.Outlined.Sync),
         ),
@@ -90,7 +107,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addIfTeiCanBeTransferr
     if (dashboardViewModel.checkIfTeiCanBeTransferred()) {
         add(
             MenuItemData(
-                id = EnrollmentMenuItem.TRANSFER,
+                id = TRANSFER,
                 label = resourceManager.getString(R.string.transfer),
                 leadingElement = MenuLeadingElement.Icon(icon = Icons.Outlined.MoveDown),
             ),
@@ -105,7 +122,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addFollowUpMenuItem(
     if (!dashboardViewModel.showFollowUpBar.value) {
         add(
             MenuItemData(
-                id = EnrollmentMenuItem.FOLLOW_UP,
+                id = FOLLOW_UP,
                 label = resourceManager.getString(R.string.mark_follow_up),
                 leadingElement = MenuLeadingElement.Icon(icon = Icons.Outlined.Flag),
             ),
@@ -120,7 +137,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addTimelineOrGroupBySt
     if (dashboardViewModel.groupByStage.value != false) {
         add(
             MenuItemData(
-                id = EnrollmentMenuItem.VIEW_TIMELINE,
+                id = VIEW_TIMELINE,
                 label = resourceManager.getString(R.string.view_timeline),
                 leadingElement = MenuLeadingElement.Icon(icon = Icons.Outlined.Timeline),
             ),
@@ -128,7 +145,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addTimelineOrGroupBySt
     } else {
         add(
             MenuItemData(
-                id = EnrollmentMenuItem.GROUP_BY_STAGE,
+                id = GROUP_BY_STAGE,
                 label = resourceManager.getString(R.string.group_by_stage),
                 leadingElement = MenuLeadingElement.Icon(icon = Icons.Outlined.Workspaces),
             ),
@@ -141,7 +158,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addHelpMenuItem(
 ) {
     add(
         MenuItemData(
-            id = EnrollmentMenuItem.HELP,
+            id = HELP,
             label = resourceManager.getString(R.string.showHelp),
             leadingElement = MenuLeadingElement.Icon(icon = Icons.AutoMirrored.Outlined.HelpOutline),
         ),
@@ -153,7 +170,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addMoreEnrollmentsMenu
 ) {
     add(
         MenuItemData(
-            id = EnrollmentMenuItem.ENROLLMENTS,
+            id = ENROLLMENTS,
             label = resourceManager.getString(R.string.more_enrollments),
             leadingElement = MenuLeadingElement.Icon(icon = Icons.AutoMirrored.Outlined.Assignment),
         ),
@@ -165,7 +182,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addShareMenuItem(
 ) {
     add(
         MenuItemData(
-            id = EnrollmentMenuItem.SHARE,
+            id = SHARE,
             label = resourceManager.getString(R.string.share),
             showDivider = true,
             leadingElement = MenuLeadingElement.Icon(icon = Icons.Outlined.Share),
@@ -176,13 +193,13 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addShareMenuItem(
 private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addStatusMenuItems(
     enrollmentUid: String,
     resourceManager: ResourceManager,
-    presenter: TeiDashboardContracts.Presenter,
+    presenter: Presenter,
 ) {
     val status = presenter.getEnrollmentStatus(enrollmentUid)
     if (status != EnrollmentStatus.COMPLETED) {
         add(
             MenuItemData(
-                id = EnrollmentMenuItem.COMPLETE,
+                id = COMPLETE,
                 label = resourceManager.getString(R.string.complete),
                 leadingElement = MenuLeadingElement.Icon(
                     icon = Icons.Outlined.CheckCircle,
@@ -196,7 +213,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addStatusMenuItems(
     if (status != EnrollmentStatus.ACTIVE) {
         add(
             MenuItemData(
-                id = EnrollmentMenuItem.ACTIVATE,
+                id = ACTIVATE,
                 label = resourceManager.getString(R.string.re_open),
                 showDivider = status == EnrollmentStatus.CANCELLED,
                 leadingElement = MenuLeadingElement.Icon(
@@ -211,7 +228,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addStatusMenuItems(
     if (status != EnrollmentStatus.CANCELLED) {
         add(
             MenuItemData(
-                id = EnrollmentMenuItem.DEACTIVATE,
+                id = DEACTIVATE,
                 label = resourceManager.getString(R.string.deactivate),
                 showDivider = true,
                 leadingElement = MenuLeadingElement.Icon(
@@ -227,7 +244,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addStatusMenuItems(
 private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addRemoveEnrollmentItem(
     enrollmentUid: String,
     resourceManager: ResourceManager,
-    presenter: TeiDashboardContracts.Presenter,
+    presenter: Presenter,
     dashboardViewModel: DashboardViewModel,
 ) {
     if (presenter.checkIfEnrollmentCanBeDeleted(enrollmentUid)) {
@@ -239,7 +256,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addRemoveEnrollmentIte
         }
         add(
             MenuItemData(
-                id = EnrollmentMenuItem.REMOVE,
+                id = REMOVE,
                 label = resourceManager.getString(R.string.remove_from),
                 supportingText = programmeName,
                 style = MenuItemStyle.ALERT,
@@ -250,13 +267,13 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addRemoveEnrollmentIte
 }
 
 private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addDeleteTeiMenuItem(
-    presenter: TeiDashboardContracts.Presenter,
+    presenter: Presenter,
     resourceManager: ResourceManager,
 ) {
     if (presenter.checkIfTEICanBeDeleted()) {
         add(
             MenuItemData(
-                id = EnrollmentMenuItem.DELETE,
+                id = DELETE,
                 label = resourceManager.getString(R.string.dashboard_menu_delete_tei_v2, presenter.teType),
                 style = MenuItemStyle.ALERT,
                 leadingElement = MenuLeadingElement.Icon(icon = Icons.Outlined.DeleteForever),

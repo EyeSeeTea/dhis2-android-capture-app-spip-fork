@@ -207,6 +207,7 @@ public class TeiDashboardPresenter implements TeiDashboardContracts.Presenter {
     }
 
     @Override public boolean isCmoProgram() {
+        //EyeSeeTea customization
         return Objects.equals(programUid, CMO_PROGRAM);
     }
 }
