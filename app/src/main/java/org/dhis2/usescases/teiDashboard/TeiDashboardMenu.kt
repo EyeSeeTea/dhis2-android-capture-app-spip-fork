@@ -39,7 +39,7 @@ fun getEnrollmentMenuList(
 
 private fun buildMenuForNoEnrollment(
     resourceManager: ResourceManager,
-    presenter: Presenter,
+    presenter: TeiDashboardContracts.Presenter,
 ): List<MenuItemData<EnrollmentMenuItem>> {
     return buildList {
         addSyncMenuItem(resourceManager)
@@ -51,7 +51,7 @@ private fun buildMenuForNoEnrollment(
 private fun buildMenuForEnrollment(
     enrollmentUid: String,
     resourceManager: ResourceManager,
-    presenter: Presenter,
+    presenter: TeiDashboardContracts.Presenter,
     dashboardViewModel: DashboardViewModel,
 ): List<MenuItemData<EnrollmentMenuItem>> {
     return buildList {
@@ -179,7 +179,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addShareMenuItem(
 private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addStatusMenuItems(
     enrollmentUid: String,
     resourceManager: ResourceManager,
-    presenter: Presenter,
+    presenter: TeiDashboardContracts.Presenter,
 ) {
     val status = presenter.getEnrollmentStatus(enrollmentUid)
     if (status != EnrollmentStatus.COMPLETED) {
@@ -230,7 +230,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addStatusMenuItems(
 private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addRemoveEnrollmentItem(
     enrollmentUid: String,
     resourceManager: ResourceManager,
-    presenter: Presenter,
+    presenter: TeiDashboardContracts.Presenter,
     dashboardViewModel: DashboardViewModel,
 ) {
     if (presenter.checkIfEnrollmentCanBeDeleted(enrollmentUid)) {
@@ -253,7 +253,7 @@ private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addRemoveEnrollmentIte
 }
 
 private fun MutableList<MenuItemData<EnrollmentMenuItem>>.addDeleteTeiMenuItem(
-    presenter: Presenter,
+    presenter: TeiDashboardContracts.Presenter,
     resourceManager: ResourceManager,
 ) {
     if (presenter.checkIfTEICanBeDeleted()) {
