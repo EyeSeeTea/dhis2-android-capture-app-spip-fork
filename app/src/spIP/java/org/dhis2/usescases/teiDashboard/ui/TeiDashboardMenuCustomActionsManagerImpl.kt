@@ -13,9 +13,8 @@ import org.dhis2.usescases.sms.domain.model.sms.SmsResult
 import org.dhis2.usescases.sms.domain.usecase.SendSmsUseCase
 import org.dhis2.usescases.sms.presentation.contentprovider.SpipSmsContentResourcesProvider
 import org.dhis2.usescases.teiDashboard.TeiDashboardMenuCustomActionsManager
-import javax.inject.Inject
 
-class TeiDashboardMenuCustomActionsManagerImpl @Inject constructor(
+class TeiDashboardMenuCustomActionsManagerImpl(
   private val dispatcher: DispatcherProvider,
   private val sendSmsUseCase: SendSmsUseCase,
   private val contentResourcesProvider: SpipSmsContentResourcesProvider,

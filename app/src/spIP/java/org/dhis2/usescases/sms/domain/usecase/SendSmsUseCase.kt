@@ -7,11 +7,10 @@ import org.dhis2.usescases.sms.domain.repository.message.MessageTemplateReposito
 import org.dhis2.usescases.sms.domain.repository.patient.PatientRepository
 import org.dhis2.usescases.sms.domain.repository.preferred.PreferredLanguageRepository
 import org.dhis2.usescases.sms.domain.repository.sms.SmsRepository
-import javax.inject.Inject
 
 const val LANGUAGE_EN = "en"
 
-class SendSmsUseCase @Inject constructor(
+class SendSmsUseCase(
   private val patientRepository: PatientRepository,
   private val smsTemplateRepository: MessageTemplateRepository,
   private val preferredLanguageRepository: PreferredLanguageRepository,

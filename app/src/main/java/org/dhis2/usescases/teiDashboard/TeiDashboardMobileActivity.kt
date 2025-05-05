@@ -58,6 +58,7 @@ import org.dhis2.usescases.enrollment.buildEnrollmentForm
 import org.dhis2.usescases.general.ActivityGlobalAbstract
 import org.dhis2.usescases.notes.NotesFragment
 import org.dhis2.usescases.qrCodes.QrActivity
+import org.dhis2.usescases.sms.DI.SPIPServiceLocator
 import org.dhis2.usescases.teiDashboard.dashboardfragments.indicators.IndicatorsFragment
 import org.dhis2.usescases.teiDashboard.dashboardfragments.indicators.VISUALIZATION_TYPE
 import org.dhis2.usescases.teiDashboard.dashboardfragments.indicators.VisualizationType
@@ -126,8 +127,9 @@ class TeiDashboardMobileActivity :
     @Inject
     lateinit var eventResourcesProvider: EventResourcesProvider
 
-    @Inject
-    lateinit var teiDashboardMenuCustomActions: TeiDashboardMenuCustomActionsManager
+    private val teiDashboardMenuCustomActions by lazy {
+        SPIPServiceLocator.provideTeiDashboardMenuCustomActionsManager(this@TeiDashboardMobileActivity)
+    }
 
     lateinit var programModel: DashboardProgramModel
     var teiUid: String? = null
