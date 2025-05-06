@@ -185,7 +185,7 @@ class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
                     }
                 }
 
-                RQ_EVENT -> openDashboard(presenter.getEnrollment()!!.uid()!!)
+                RQ_EVENT -> openDashboard(presenter.getEnrollment()!!.uid()!!, false)
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -231,10 +231,10 @@ class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
     private val openEventForResult = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) {
-        openDashboard(presenter.getEnrollment()!!.uid()!!)
+        openDashboard(presenter.getEnrollment()!!.uid()!!,false)
     }
 
-    override fun openDashboard(enrollmentUid: String) {
+    override fun openDashboard(enrollmentUid: String, sendSMS: Boolean) {
         if (forRelationship) {
             val intent = Intent()
             intent.putExtra("TEI_A_UID", presenter.getEnrollment()!!.trackedEntityInstance())
@@ -245,6 +245,10 @@ class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
             bundle.putString(PROGRAM_UID, presenter.getProgram()?.uid())
             bundle.putString(TEI_UID, presenter.getEnrollment()!!.trackedEntityInstance())
             bundle.putString(ENROLLMENT_UID, enrollmentUid)
+
+            //EyeSeeTea customization - Send SMS
+            bundle.putBoolean(Constants.SEND_SMS, sendSMS)
+
             startActivity(TeiDashboardMobileActivity::class.java, bundle, true, false, null)
         }
     }
