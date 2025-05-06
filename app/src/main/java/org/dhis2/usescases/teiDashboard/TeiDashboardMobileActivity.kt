@@ -37,6 +37,7 @@ import org.dhis2.usescases.enrollment.EnrollmentActivity
 import org.dhis2.usescases.enrollment.EnrollmentActivity.Companion.getIntent
 import org.dhis2.usescases.general.ActivityGlobalAbstract
 import org.dhis2.usescases.qrCodes.QrActivity
+import org.dhis2.usescases.sms.cmoProgram
 import org.dhis2.usescases.teiDashboard.adapters.DashboardPagerAdapter
 import org.dhis2.usescases.teiDashboard.adapters.DashboardPagerAdapter.Companion.NO_POSITION
 import org.dhis2.usescases.teiDashboard.adapters.DashboardPagerAdapter.DashboardPageType
@@ -196,6 +197,20 @@ class TeiDashboardMobileActivity :
                 updateStatus()
             }
         }
+
+        //EyeSeeTea customization - Send SMS
+        // Commented automatic send sms to create TEI because
+        // the client wants to send it manually for the moment
+        // we leave all infrastructure to send automatically
+    /*    val sendSMS = intent.getBooleanExtra(Constants.SEND_SMS,false)
+
+        if(sendSMS && teiUid != null){
+                sendSms(
+                    this,
+                    binding.root,
+                    teiUid!!,
+                )
+        }*/
     }
 
     private fun setEditButton() {
@@ -577,6 +592,11 @@ class TeiDashboardMobileActivity :
                     }
                     if (dashboardViewModel.showFollowUpBar.value) {
                         popupMenu.menu.findItem(R.id.markForFollowUp).isVisible = false
+                    }
+
+                    //EyeSeeTea customization
+                    if (presenter.programUid != cmoProgram ){
+                        popupMenu.menu.findItem(R.id.share).isVisible = false
                     }
                 }
                 Unit
