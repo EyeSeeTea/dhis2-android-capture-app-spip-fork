@@ -29,7 +29,7 @@ class SendSmsUseCase(
     val patient = patientRepository.getByUid(uid)
 
     val messageTemplate = getMessageTemplate(patient.preferredLanguage)
-      ?: return SmsResult.TemplateFailure
+    messageTemplate ?: return SmsResult.TemplateFailure
 
     val message = Message(
       text = messageTemplate.text
@@ -61,12 +61,12 @@ class SendSmsUseCase(
    */
   private suspend fun getMessageTemplate(language: String): MessageTemplate? {
     val messageTemplate = smsTemplateRepository.getByLanguage(language)
-    return if (messageTemplate.isSuccess) {
+    return if (messageTemplate.isSome()) {
       messageTemplate.getOrThrow()
     } else {
       val defaultMessageTemplate = smsTemplateRepository.getByLanguage(LANGUAGE_EN)
 
-      if (defaultMessageTemplate.isSuccess) {
+      if (defaultMessageTemplate.isSome()) {
         defaultMessageTemplate.getOrThrow()
       } else {
         return null
