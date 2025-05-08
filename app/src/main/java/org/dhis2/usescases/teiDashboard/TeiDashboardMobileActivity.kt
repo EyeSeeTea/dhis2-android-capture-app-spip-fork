@@ -127,10 +127,6 @@ class TeiDashboardMobileActivity :
     @Inject
     lateinit var eventResourcesProvider: EventResourcesProvider
 
-    private val teiDashboardMenuCustomActions by lazy {
-        SPIPServiceLocator.provideTeiDashboardMenuCustomActionsManager(this@TeiDashboardMobileActivity)
-    }
-
     lateinit var programModel: DashboardProgramModel
     var teiUid: String? = null
     var programUid: String? = null
@@ -218,6 +214,23 @@ class TeiDashboardMobileActivity :
         setUpNavigationBar()
         showLoadingProgress(false)
         setupMoreOptionsMenu()
+    }
+
+    /** EyeSeeTea customization - Send SMS **/
+    private fun sendAutomaticSMS() {
+         /**
+         * Unused automatic send sms to create TEI because
+         * the client wants to send it manually for the moment
+         * we leave all infrastructure to send automatically
+        **/
+        val sendSMS = intent.getBooleanExtra(Constants.SEND_SMS, false)
+        if (sendSMS && teiUid != null) {
+            sendSms(
+                this,
+                binding.root,
+                teiUid!!,
+            )
+        }
     }
 
     private fun observeErrorMessages() {
@@ -441,7 +454,6 @@ class TeiDashboardMobileActivity :
 
     override fun onDestroy() {
         (applicationContext as App).releaseDashboardComponent()
-        teiDashboardMenuCustomActions.onDestroy()
         super.onDestroy()
     }
 
@@ -856,10 +868,15 @@ class TeiDashboardMobileActivity :
 
                     EnrollmentMenuItem.DELETE -> showDeleteTEIConfirmationDialog()
                     EnrollmentMenuItem.REMOVE -> showRemoveEnrollmentConfirmationDialog()
-                    EnrollmentMenuItem.SEND_SMS -> teiDashboardMenuCustomActions.sendSms(
-                        teiUid,
-                        this.binding.root
-                    )
+                    else -> {
+                        customClick(
+                            menuId = itemId,
+                            teiDashboardMobileActivity = this,
+                            programUid = programUid!!,
+                            enrollmentUid = enrollmentUid!!,
+                            teiUid = teiUid!!,
+                        )
+                    }
                 }
             }
         }

@@ -11,13 +11,6 @@ class PreferredLanguageD2Repository(
   private val d2: D2
 ) : PreferredLanguageRepository {
 
-  /**
-   * Retrieves a PreferredLanguage object by its code.
-   *
-   * @param code The code of the preferred language to retrieve.
-   * @return The PreferredLanguage object corresponding to the provided code.
-   * @throws IllegalArgumentException if no option is found with the given code.
-   */
   override fun getByCode(
     code: String
   ): PreferredLanguage {
@@ -32,13 +25,6 @@ class PreferredLanguageD2Repository(
     return buildPreferredLanguage(option, code)
   }
 
-  /**
-   * Constructs a PreferredLanguage object from the provided Option object.
-   *
-   * @param option The Option object containing language data.
-   * @param code The code of the preferred language.
-   * @return A PreferredLanguage object populated with data from the Option.
-   */
   private fun buildPreferredLanguage(
     option: Option,
     code: String

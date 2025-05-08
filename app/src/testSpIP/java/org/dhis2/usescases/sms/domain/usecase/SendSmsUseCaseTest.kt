@@ -3,129 +3,167 @@ package org.dhis2.usescases.sms.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.dhis2.usescases.sms.data.model.MessageTemplate
-import org.dhis2.usescases.sms.data.model.OutboundResponse
 import org.dhis2.usescases.sms.domain.model.patient.Patient
 import org.dhis2.usescases.sms.domain.model.preffered.PreferredLanguage
 import org.dhis2.usescases.sms.domain.model.sms.Message
 import org.dhis2.usescases.sms.domain.model.sms.SmsResult
+import org.dhis2.usescases.sms.domain.model.types.Maybe
 import org.dhis2.usescases.sms.domain.repository.message.MessageTemplateRepository
 import org.dhis2.usescases.sms.domain.repository.patient.PatientRepository
 import org.dhis2.usescases.sms.domain.repository.preferred.PreferredLanguageRepository
 import org.dhis2.usescases.sms.domain.repository.sms.SmsRepository
-import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.mock
+import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(MockitoJUnitRunner::class)
 @ExperimentalCoroutinesApi
 class SendSmsUseCaseTest {
 
-  private val patientRepository: PatientRepository = mock()
-  private val smsTemplateRepository: MessageTemplateRepository = mock()
-  private val preferredLanguageRepository: PreferredLanguageRepository = mock()
-  private val smsRepository: SmsRepository = mock()
-  private lateinit var sendSmsUseCase: SendSmsUseCase
-  private val fakeOutboundResponse : OutboundResponse = mock()
-  private val uid = "12345"
-  private val fakeName = "John Doe"
-  private val LANGUAGE_EN = "en"
-  private val LANGUAGE_ES = "es"
-  private val LANGUAGE_FR = "fr"
+  @Mock
+  lateinit var patientRepository: PatientRepository
 
-  @Before
-  fun setUp() {
-    sendSmsUseCase = SendSmsUseCase(
-      patientRepository,
-      smsTemplateRepository,
-      preferredLanguageRepository,
-      smsRepository
-    )
-  }
+  @Mock
+  lateinit var messageTemplateRepository: MessageTemplateRepository
+
+  @Mock
+  lateinit var smsRepository: SmsRepository
+
+  @Mock
+  lateinit var preferredLanguageRepository: PreferredLanguageRepository
+
+  private val defaultEnMessageTemplate = "Default message template"
 
   @Test
-  fun `WHEN Patient has preferred Language THEN send SmsSuccessfully`() = runTest {
-    val patient = Patient(
-      uid = uid,
-      number = "123456789",
-      name = fakeName,
-      phone = "123456789",
-      preferredLanguage = LANGUAGE_EN
+  fun `should send expected es message to expected number`() = runTest {
+    val phone = "1234567890"
+
+    val useCase = givenAPatientAndATemplate(
+      phone = phone,
+      number = "123-456",
+      preferredLanguage = "es",
+      messageTemplate = "Hola {{fullName}}, tu numero de paciente es {{patientNumber}}"
     )
-    val messageTemplate = MessageTemplate("Hola {{fullName}}", LANGUAGE_EN)
-    val message = Message("Hola $fakeName", listOf("123456789"))
 
-    whenever(patientRepository.getByUid(uid)).thenReturn(patient)
-    whenever(smsTemplateRepository.getByLanguage(LANGUAGE_EN)).thenReturn(Result.success(messageTemplate))
-    whenever(smsRepository.send(message)).thenReturn(Result.success(fakeOutboundResponse))
+    val result = useCase.invoke("PATIENT_UID")
 
-    val result = sendSmsUseCase.invoke(uid)
+    val expectedMessage = Message(
+      text = "Hola John Doe, tu numero de paciente es 123-456",
+      recipients = listOf(phone)
+    )
 
+    verify(smsRepository).send(expectedMessage)
     assert(result is SmsResult.Success)
   }
 
   @Test
-  fun `WHEN Preferred Language Template Not Found THEN sends Sms Successfully Using English`() = runTest {
-    val patient = Patient(
-      uid = uid,
-      number = "123456789",
-      name = fakeName,
-      phone = "123456789",
-      preferredLanguage = LANGUAGE_FR
+  fun `should use default en template if there is not template for specific language`() = runTest {
+    val phone = "1234567890"
+
+    val useCase = givenAPatientAndATemplate(
+      phone = phone,
+      preferredLanguage = "es",
+      messageTemplate =  null
     )
-    val preferredLanguage = PreferredLanguage(uid, LANGUAGE_FR, "French")
-    val messageTemplate = MessageTemplate("Hello {{fullName}}", LANGUAGE_EN)
-    val message = Message("Hello $fakeName", listOf("123456789"))
 
-    whenever(patientRepository.getByUid(uid)).thenReturn(patient)
-    whenever(preferredLanguageRepository.getByCode(LANGUAGE_FR)).thenReturn(preferredLanguage)
-    whenever(smsTemplateRepository.getByLanguage(LANGUAGE_FR)).thenReturn(Result.failure(Exception()))
-    whenever(smsTemplateRepository.getByLanguage(LANGUAGE_EN)).thenReturn(Result.success(messageTemplate))
-    whenever(smsRepository.send(message)).thenReturn(Result.success(fakeOutboundResponse))
+    val result = useCase.invoke("PATIENT_UID")
 
-    val result = sendSmsUseCase.invoke(uid)
+    val expectedMessage = Message(
+      text = defaultEnMessageTemplate,
+      recipients = listOf(phone)
+    )
 
+    verify(smsRepository).send(expectedMessage)
     assert(result is SmsResult.SuccessUsingEn)
   }
 
   @Test
-  fun `WHEN No Template Found For AnyLanguage THEN returns TemplateFailure`() = runTest {
-    val patient = Patient(
-      uid = uid,
-      number = "123456789",
-      name = fakeName,
-      phone = "123456789",
-      preferredLanguage = LANGUAGE_FR
+  fun `should return template failure if there are not any template`() = runTest {
+    val useCase = givenAPatientAndATemplate(
+      messageTemplate = null,
+      createDefaultEnTemplate = false
     )
 
-    whenever(patientRepository.getByUid(uid)).thenReturn(patient)
-    whenever(smsTemplateRepository.getByLanguage(LANGUAGE_FR)).thenReturn(Result.failure(Exception()))
-    whenever(smsTemplateRepository.getByLanguage(LANGUAGE_EN)).thenReturn(Result.failure(Exception()))
-
-    val result = sendSmsUseCase.invoke(uid)
+    val result = useCase.invoke("PATIENT_UID")
 
     assert(result is SmsResult.TemplateFailure)
   }
 
   @Test
-  fun `WHEN Sms Sending Fails THEN returns Send Failure`() = runTest {
-    val patient = Patient(
-      uid = uid,
-      number = "123456789",
-      name = fakeName,
-      phone = "123456789",
-      preferredLanguage = LANGUAGE_ES
-    )
-    val messageTemplate = MessageTemplate("Hola {{fullName}}", LANGUAGE_ES)
-    val message = Message("Hola $fakeName", listOf("123456789"))
+  fun `should return send failure if send throw and error`() = runTest {
+    val useCase = givenAPatientAndATemplate()
 
-    whenever(patientRepository.getByUid(uid)).thenReturn(patient)
-    whenever(smsTemplateRepository.getByLanguage(LANGUAGE_ES)).thenReturn(Result.success(messageTemplate))
-    whenever(smsRepository.send(message)).thenReturn(Result.failure(Exception()))
+    givenAErrortoSendEmail()
 
-    val result = sendSmsUseCase.invoke(uid)
+    val result = useCase.invoke("PATIENT_UID")
 
     assert(result is SmsResult.SendFailure)
   }
 
+
+  private suspend fun givenAPatientAndATemplate(
+    phone: String = "1234567890",
+    number: String = "123-456",
+    preferredLanguage: String = "es",
+    messageTemplate: String?=  "Hola {{fullName}}, tu numero de paciente es {{patientNumber}}",
+    createDefaultEnTemplate: Boolean = true
+  ): SendSmsUseCase {
+
+    whenever(preferredLanguageRepository.getByCode(any())).thenReturn(PreferredLanguage("PATIENT_UID", "en", "English"))
+
+    whenever(
+      patientRepository.getByUid(any())
+    ).thenReturn(
+      Patient(
+        "PATIENT_UID",
+        number,
+        "John Doe",
+        phone,
+        preferredLanguage
+      )
+    )
+
+    if (messageTemplate == null) {
+      whenever(
+        messageTemplateRepository.getByLanguage(preferredLanguage)
+      ).thenReturn(Maybe.None)
+    } else {
+      whenever(
+        messageTemplateRepository.getByLanguage(preferredLanguage)
+      ).thenReturn(Maybe.Some(MessageTemplate(text = messageTemplate, language = preferredLanguage)))
+    }
+
+    if (createDefaultEnTemplate) {
+      whenever(
+        messageTemplateRepository.getByLanguage("en")
+      ).thenReturn(
+        Maybe.Some(
+          MessageTemplate(
+            text = defaultEnMessageTemplate,
+            language = "en"
+          )
+        )
+      )
+    } else {
+      whenever(
+        messageTemplateRepository.getByLanguage("en")
+      ).thenReturn(Maybe.None)
+    }
+
+    return SendSmsUseCase(
+      patientRepository = patientRepository,
+      smsTemplateRepository = messageTemplateRepository,
+      preferredLanguageRepository = preferredLanguageRepository,
+      smsRepository = smsRepository
+    )
+  }
+
+  private suspend fun givenAErrortoSendEmail() {
+    whenever(smsRepository.send(any())).thenThrow(RuntimeException("Send error"))
+  }
 
 }

@@ -38,12 +38,6 @@ class MessageTemplateD2Repository(
     )
   }
 
-  /**
-   * Retrieves the description of a constant by its UID.
-   *
-   * @param uid The UID of the constant to retrieve.
-   * @return The description of the constant, or an empty string if not found.
-   */
   private suspend fun getDescriptionConstant(uid: String): String {
     return try {
       val body = constantApi.getConstant(uid)

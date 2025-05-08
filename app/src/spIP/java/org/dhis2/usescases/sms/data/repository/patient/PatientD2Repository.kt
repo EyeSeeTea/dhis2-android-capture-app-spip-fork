@@ -15,13 +15,6 @@ class PatientD2Repository(
   private val d2: D2
 ) : PatientRepository {
 
-  /**
-   * This repository is responsible for fetching patient data from the D2 database.
-   * It uses the D2 API to retrieve the tracked entity instance (TEI) associated with a given UID.
-   * The TEI contains various attributes that represent patient information.
-   *
-   * @param d2 The D2 instance used to interact with the DHIS2 database.
-   */
   override fun getByUid(uid: String): Patient {
     val tei = d2.trackedEntityModule().trackedEntityInstances()
       .withTrackedEntityAttributeValues().uid(uid).blockingGet()
@@ -29,13 +22,7 @@ class PatientD2Repository(
     return buildPatient(tei)
   }
 
-  /**
-   * This function constructs a Patient object from the provided TrackedEntityInstance (TEI).
-   * It retrieves various attributes from the TEI and uses them to populate the Patient object.
-   *
-   * @param tei The TrackedEntityInstance object containing patient data.
-   * @return A Patient object populated with data from the TEI.
-   */
+
   private fun buildPatient(
     tei: TrackedEntityInstance
   ): Patient {
@@ -54,14 +41,6 @@ class PatientD2Repository(
     )
   }
 
-  /**
-   * This function retrieves the value of a specific attribute from the TrackedEntityInstance (TEI).
-   * It searches for the attribute by its UID and returns its value.
-   *
-   * @param tei The TrackedEntityInstance object containing patient data.
-   * @param attribute The UID of the attribute to retrieve.
-   * @return The value of the specified attribute, or an empty string if not found.
-   */
   private fun getAttributeValue(
     tei: TrackedEntityInstance,
     attribute: String
