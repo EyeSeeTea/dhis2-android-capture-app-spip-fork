@@ -1,9 +1,7 @@
 package org.dhis2.usescases.teiDashboard
 
-import android.content.Context
 import android.view.View
 import android.widget.TextView
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -78,11 +76,6 @@ fun sendSms(activity: AppCompatActivity, parentView: View, teiUid: String) {
     }
   }
 }
-
-private fun getText(
-  context : Context,
-  @StringRes stringRes: Int,
-) : String = context.getString(stringRes)
 
 fun showCustomSnackbar(
   activity: AppCompatActivity,
