@@ -399,7 +399,7 @@ class EventRepository(
                 .byUid()
                 .eq(orgUnitUID)
                 .one().blockingGet()
-        }?.displayName()
+        }?.uid()
     }
 
     private fun createEventReportDateField(): FieldUiModel {
