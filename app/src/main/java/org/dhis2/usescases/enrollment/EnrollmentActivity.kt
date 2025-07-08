@@ -12,6 +12,7 @@ import org.dhis2.App
 import org.dhis2.R
 import org.dhis2.commons.Constants.ENROLLMENT_UID
 import org.dhis2.commons.Constants.PROGRAM_UID
+import org.dhis2.commons.Constants.SEND_SMS
 import org.dhis2.commons.Constants.TEI_UID
 import org.dhis2.commons.data.TeiAttributesInfo
 import org.dhis2.commons.dialogs.imagedetail.ImageDetailActivity
@@ -197,7 +198,7 @@ class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
         presenter.getEnrollment()?.uid()?.let { it1 -> openDashboard(it1) }
     }
 
-    override fun openDashboard(enrollmentUid: String) {
+    override fun openDashboard(enrollmentUid: String? , sendSMS: Boolean) {
         if (forRelationship) {
             val intent = Intent()
             intent.putExtra("TEI_A_UID", presenter.getEnrollment()?.trackedEntityInstance())
@@ -208,6 +209,8 @@ class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
             bundle.putString(PROGRAM_UID, presenter.getProgram()?.uid())
             bundle.putString(TEI_UID, presenter.getEnrollment()?.trackedEntityInstance())
             bundle.putString(ENROLLMENT_UID, enrollmentUid)
+            //EyeSeeTea customization - Send SMS
+            bundle.putBoolean(SEND_SMS, sendSMS)
             startActivity(TeiDashboardMobileActivity::class.java, bundle, true, false, null)
         }
     }

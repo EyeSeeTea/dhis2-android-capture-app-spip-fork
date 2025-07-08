@@ -30,6 +30,7 @@ import org.hisp.dhis.android.core.event.EventStatus
 import org.hisp.dhis.android.core.maintenance.D2Error
 import org.hisp.dhis.android.core.program.Program
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityAttributeValue
+import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstance
 import org.hisp.dhis.android.core.trackedentity.TrackedEntityInstanceObjectRepository
 import timber.log.Timber
 import java.util.Calendar.DAY_OF_YEAR
@@ -143,7 +144,7 @@ class EnrollmentPresenterImpl(
                             {
                                 it.second?.let { eventUid ->
                                     view.openEvent(eventUid)
-                                } ?: view.openDashboard(it.first)
+                                } ?: view.openDashboard(it.first, true)
                             },
                             { Timber.tag(TAG).e(it) },
                         ),
@@ -168,6 +169,10 @@ class EnrollmentPresenterImpl(
 
     fun getEnrollment(): Enrollment? {
         return enrollmentObjectRepository.blockingGet()
+    }
+
+    fun getTEI(): TrackedEntityInstance? {
+        return teiRepository.blockingGet()
     }
 
     fun getProgram(): Program? {

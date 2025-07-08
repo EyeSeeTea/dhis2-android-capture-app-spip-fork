@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.Timeline
 import androidx.compose.material.icons.outlined.Workspaces
 import org.dhis2.R
 import org.dhis2.commons.resources.ResourceManager
+import org.dhis2.usescases.sms.presentation.menu.addSendSmsMenuItem
 import org.dhis2.usescases.teiDashboard.DashboardEnrollmentModel
 import org.dhis2.usescases.teiDashboard.DashboardViewModel
 import org.dhis2.usescases.teiDashboard.EnrollmentMenuItem
@@ -58,6 +59,12 @@ private fun buildMenuForEnrollment(
     dashboardViewModel: DashboardViewModel,
 ): List<MenuItemData<EnrollmentMenuItem>> {
     return buildList {
+        //EyeSeeTea customization - Send SMS
+        addSendSmsMenuItem(
+            isMenuOptionAvailable = presenter.isCmoProgram,
+            resourceManager = resourceManager
+        )
+        //
         addSyncMenuItem(resourceManager)
         addIfTeiCanBeTransferred(dashboardViewModel, resourceManager)
         addFollowUpMenuItem(dashboardViewModel, resourceManager)

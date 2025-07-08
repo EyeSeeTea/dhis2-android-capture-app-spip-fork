@@ -11,7 +11,7 @@ import org.dhis2.common.mockwebserver.MockWebServerRobot.Companion.API_OLD_EVENT
 import org.dhis2.common.mockwebserver.MockWebServerRobot.Companion.API_OLD_EVENTS_RESPONSE
 import org.dhis2.common.mockwebserver.MockWebServerRobot.Companion.API_OLD_TRACKED_ENTITY_PATH
 import org.dhis2.common.mockwebserver.MockWebServerRobot.Companion.API_OLD_TRACKED_ENTITY_RESPONSE
-import org.dhis2.commons.resources.SIMPLE_DATE_FORMAT
+import org.dhis2.commons.date.DateUtils.SIMPLE_DATE_FORMAT
 import org.dhis2.lazyActivityScenarioRule
 import org.dhis2.usescases.BaseTest
 import org.dhis2.usescases.flow.teiFlow.entity.DateRegistrationUIModel

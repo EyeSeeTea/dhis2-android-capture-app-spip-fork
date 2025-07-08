@@ -14,7 +14,7 @@ interface EnrollmentView : AbstractActivityContracts.View {
 
     fun displayTeiInfo(teiInfo: TeiAttributesInfo)
     fun openEvent(eventUid: String)
-    fun openDashboard(enrollmentUid: String)
+    fun openDashboard(enrollmentUid: String?, sendSMS: Boolean = false)
     fun goBack()
     fun setResultAndFinish()
     fun requestFocus()

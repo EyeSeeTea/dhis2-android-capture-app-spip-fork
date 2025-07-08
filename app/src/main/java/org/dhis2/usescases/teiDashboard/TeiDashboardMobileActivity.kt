@@ -58,6 +58,7 @@ import org.dhis2.usescases.enrollment.buildEnrollmentForm
 import org.dhis2.usescases.general.ActivityGlobalAbstract
 import org.dhis2.usescases.notes.NotesFragment
 import org.dhis2.usescases.qrCodes.QrActivity
+import org.dhis2.usescases.sms.DI.SPIPServiceLocator
 import org.dhis2.usescases.teiDashboard.dashboardfragments.indicators.IndicatorsFragment
 import org.dhis2.usescases.teiDashboard.dashboardfragments.indicators.VISUALIZATION_TYPE
 import org.dhis2.usescases.teiDashboard.dashboardfragments.indicators.VisualizationType
@@ -213,6 +214,23 @@ class TeiDashboardMobileActivity :
         setUpNavigationBar()
         showLoadingProgress(false)
         setupMoreOptionsMenu()
+    }
+
+    /** EyeSeeTea customization - Send SMS **/
+    private fun sendAutomaticSMS() {
+         /**
+         * Unused automatic send sms to create TEI because
+         * the client wants to send it manually for the moment
+         * we leave all infrastructure to send automatically
+        **/
+        val sendSMS = intent.getBooleanExtra(Constants.SEND_SMS, false)
+        if (sendSMS && teiUid != null) {
+            sendSms(
+                this,
+                binding.root,
+                teiUid!!,
+            )
+        }
     }
 
     private fun observeErrorMessages() {
@@ -850,6 +868,15 @@ class TeiDashboardMobileActivity :
 
                     EnrollmentMenuItem.DELETE -> showDeleteTEIConfirmationDialog()
                     EnrollmentMenuItem.REMOVE -> showRemoveEnrollmentConfirmationDialog()
+                    else -> {
+                        customClick(
+                            menuId = itemId,
+                            teiDashboardMobileActivity = this,
+                            programUid = programUid!!,
+                            enrollmentUid = enrollmentUid!!,
+                            teiUid = teiUid!!,
+                        )
+                    }
                 }
             }
         }
@@ -869,5 +896,6 @@ enum class EnrollmentMenuItem {
     DEACTIVATE,
     COMPLETE,
     DELETE,
-    REMOVE
+    REMOVE,
+    SEND_SMS,
 }
