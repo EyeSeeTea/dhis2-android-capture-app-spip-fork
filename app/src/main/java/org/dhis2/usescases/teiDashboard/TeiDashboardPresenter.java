@@ -1,38 +1,27 @@
 package org.dhis2.usescases.teiDashboard;
 
-import static androidx.core.content.ContextCompat.getString;
+import static org.dhis2.commons.matomo.Actions.OPEN_ANALYTICS;
+import static org.dhis2.commons.matomo.Actions.OPEN_NOTES;
+import static org.dhis2.commons.matomo.Actions.OPEN_RELATIONSHIPS;
+import static org.dhis2.commons.matomo.Categories.DASHBOARD;
+import static org.dhis2.usescases.sms.ConstantsKt.CMO_PROGRAM;
+import static org.dhis2.utils.analytics.AnalyticsConstants.CLICK;
+import static org.dhis2.utils.analytics.AnalyticsConstants.DELETE_TEI;
 
-import com.google.gson.reflect.TypeToken;
-
-import org.dhis2.R;
-import org.dhis2.commons.prefs.Preference;
+import java.util.Objects;
+import javax.annotation.Nullable;
+import org.dhis2.commons.Constants;
+import org.dhis2.commons.matomo.MatomoAnalyticsController;
 import org.dhis2.commons.prefs.PreferenceProvider;
 import org.dhis2.commons.schedulers.SchedulerProvider;
-import org.dhis2.utils.AuthorityException;
-import org.dhis2.commons.Constants;
 import org.dhis2.utils.analytics.AnalyticsHelper;
-import org.dhis2.commons.matomo.MatomoAnalyticsController;
 import org.hisp.dhis.android.core.common.Unit;
 import org.hisp.dhis.android.core.enrollment.EnrollmentStatus;
 import org.hisp.dhis.android.core.program.Program;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.processors.PublishProcessor;
 import timber.log.Timber;
-
-import static org.dhis2.commons.matomo.Actions.OPEN_NOTES;
-import static org.dhis2.commons.matomo.Actions.OPEN_RELATIONSHIPS;
-import static org.dhis2.utils.analytics.AnalyticsConstants.ACTIVE_FOLLOW_UP;
-import static org.dhis2.utils.analytics.AnalyticsConstants.CLICK;
-import static org.dhis2.utils.analytics.AnalyticsConstants.DELETE_ENROLL;
-import static org.dhis2.utils.analytics.AnalyticsConstants.DELETE_TEI;
-import static org.dhis2.commons.matomo.Actions.OPEN_ANALYTICS;
-import static org.dhis2.commons.matomo.Categories.DASHBOARD;
-import static org.dhis2.utils.analytics.AnalyticsConstants.FOLLOW_UP;
 
 public class TeiDashboardPresenter implements TeiDashboardContracts.Presenter {
 
@@ -42,17 +31,15 @@ public class TeiDashboardPresenter implements TeiDashboardContracts.Presenter {
     private final PreferenceProvider preferenceProvider;
     private final TeiDashboardContracts.View view;
 
-    private String teiUid;
     public String programUid;
 
     public CompositeDisposable compositeDisposable;
-    public DashboardProgramModel dashboardProgramModel;
     private PublishProcessor<Unit> notesCounterProcessor;
     private MatomoAnalyticsController matomoAnalyticsController;
 
     public TeiDashboardPresenter(
             TeiDashboardContracts.View view,
-            String teiUid, String programUid,
+            String programUid,
             DashboardRepository dashboardRepository,
             SchedulerProvider schedulerProvider,
             AnalyticsHelper analyticsHelper,
@@ -60,7 +47,6 @@ public class TeiDashboardPresenter implements TeiDashboardContracts.Presenter {
             MatomoAnalyticsController matomoAnalyticsController
     ) {
         this.view = view;
-        this.teiUid = teiUid;
         this.programUid = programUid;
         this.analyticsHelper = analyticsHelper;
         this.dashboardRepository = dashboardRepository;
@@ -69,50 +55,6 @@ public class TeiDashboardPresenter implements TeiDashboardContracts.Presenter {
         this.matomoAnalyticsController = matomoAnalyticsController;
         compositeDisposable = new CompositeDisposable();
         notesCounterProcessor = PublishProcessor.create();
-    }
-
-    @Override
-    public void init() {
-        if (programUid != null)
-            compositeDisposable.add(Observable.zip(
-                    dashboardRepository.getTrackedEntityInstance(teiUid),
-                    dashboardRepository.getEnrollment(),
-                    dashboardRepository.getProgramStages(programUid),
-                    dashboardRepository.getTEIEnrollmentEvents(programUid, teiUid),
-                    dashboardRepository.getAttributesMap(programUid, teiUid),
-                    dashboardRepository.getTEIAttributeValues(programUid, teiUid),
-                    dashboardRepository.getTeiOrgUnits(teiUid, programUid),
-                    dashboardRepository.getTeiActivePrograms(teiUid, false),
-                    DashboardProgramModel::new)
-                    .subscribeOn(schedulerProvider.io())
-                    .observeOn(schedulerProvider.ui())
-                    .subscribe(
-                            dashboardModel -> {
-                                this.dashboardProgramModel = dashboardModel;
-                                view.setData(dashboardModel);
-                            },
-                            Timber::e
-                    )
-            );
-
-        else {
-            compositeDisposable.add(Observable.zip(
-                    dashboardRepository.getTrackedEntityInstance(teiUid),
-                    dashboardRepository.getTEIAttributeValues(null, teiUid),
-                    dashboardRepository.getTeiOrgUnits(teiUid, null),
-                    dashboardRepository.getTeiActivePrograms(teiUid, true),
-                    dashboardRepository.getTEIEnrollments(teiUid),
-                    DashboardProgramModel::new)
-                    .subscribeOn(schedulerProvider.io())
-                    .observeOn(schedulerProvider.ui())
-                    .subscribe(
-                            dashboardModel -> {
-                                this.dashboardProgramModel = dashboardModel;
-                                view.setDataWithOutProgram(dashboardProgramModel);
-                            },
-                            Timber::e)
-            );
-        }
     }
 
     @Override
@@ -136,6 +78,16 @@ public class TeiDashboardPresenter implements TeiDashboardContracts.Presenter {
     }
 
     @Override
+    public Boolean checkIfTEICanBeDeleted() {
+        return dashboardRepository.checkIfDeleteTeiIsPossible();
+    }
+
+    @Override
+    public Boolean checkIfEnrollmentCanBeDeleted(String enrollmentUid) {
+        return dashboardRepository.checkIfDeleteEnrollmentIsPossible(enrollmentUid);
+    }
+
+    @Override
     public void onEnrollmentSelectorClick() {
         view.goToEnrollmentList();
     }
@@ -144,13 +96,12 @@ public class TeiDashboardPresenter implements TeiDashboardContracts.Presenter {
     public void setProgram(Program program) {
         this.programUid = program.uid();
         view.restoreAdapter(programUid);
-        init();
     }
 
     @Override
     public void deleteTei() {
         compositeDisposable.add(
-                dashboardRepository.deleteTeiIfPossible()
+                dashboardRepository.deleteTei()
                         .subscribeOn(schedulerProvider.io())
                         .observeOn(schedulerProvider.ui())
                         .subscribe(
@@ -163,29 +114,6 @@ public class TeiDashboardPresenter implements TeiDashboardContracts.Presenter {
                                     }
                                 },
                                 Timber::e
-                        )
-        );
-    }
-
-    @Override
-    public void deleteEnrollment() {
-        compositeDisposable.add(
-                dashboardRepository.deleteEnrollmentIfPossible(
-                        dashboardProgramModel.getCurrentEnrollment().uid()
-                )
-                        .subscribeOn(schedulerProvider.io())
-                        .observeOn(schedulerProvider.ui())
-                        .subscribe(
-                                hasMoreEnrollments -> {
-                                    analyticsHelper.setEvent(DELETE_ENROLL, CLICK, DELETE_ENROLL);
-                                    view.handleEnrollmentDeletion(hasMoreEnrollments);
-                                },
-                                error -> {
-                                    if (error instanceof AuthorityException)
-                                        view.authorityErrorMessage();
-                                    else
-                                        Timber.e(error);
-                                }
                         )
         );
     }
@@ -241,15 +169,6 @@ public class TeiDashboardPresenter implements TeiDashboardContracts.Presenter {
     }
 
     @Override
-    public Boolean getProgramGrouping() {
-        if (programUid != null) {
-            return getGrouping().containsKey(programUid) ? getGrouping().get(programUid) : true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
     public void handleShowHideFilters(boolean showFilters) {
         if (showFilters) {
             view.hideTabsAndDisableSwipe();
@@ -270,22 +189,25 @@ public class TeiDashboardPresenter implements TeiDashboardContracts.Presenter {
                         .subscribeOn(schedulerProvider.io())
                         .observeOn(schedulerProvider.ui())
                         .subscribe(statusCode -> {
-                            if (statusCode == StatusChangeResultCode.CHANGED) {
-                                view.updateStatus();
-                            } else {
+                            if (statusCode != StatusChangeResultCode.CHANGED) {
                                 view.displayStatusError(statusCode);
                             }
                         }, Timber::e)
         );
     }
 
-    private Map<String, Boolean> getGrouping() {
-        TypeToken<HashMap<String, Boolean>> typeToken =
-                new TypeToken<HashMap<String, Boolean>>() {
-                };
-        return preferenceProvider.getObjectFromJson(
-                Preference.GROUPING,
-                typeToken,
-                new HashMap<>());
+  @Override
+  public void onTransferClick() {
+    view.showOrgUnitSelector(programUid);
+  }
+
+    @Override
+    public boolean hasWriteAccess() {
+        return dashboardRepository.enrollmentHasWriteAccess();
+    }
+
+    @Override public boolean isCmoProgram() {
+        //EyeSeeTea customization
+        return Objects.equals(programUid, CMO_PROGRAM);
     }
 }

@@ -1,22 +1,23 @@
 package org.dhis2.usescases.sms.data.api
 
-import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.POST
 
-data class OutboundResponse(
-    val httpStatus: String,
-    val httpStatusCode: Int,
-    val status: String,
-    val message: String
-)
-
-data class OutboundRequest(
-    val message: String,
-    val recipients: List<String>
-)
+import org.dhis2.usescases.sms.data.model.OutboundRequest
+import org.dhis2.usescases.sms.data.model.OutboundResponse
+import org.hisp.dhis.android.core.arch.api.HttpServiceClient
 
 interface OutboundApi {
-    @POST("sms/outbound")
-    fun sendSms(@Body request: OutboundRequest): Call<OutboundResponse>
+  suspend fun sendSms(request: OutboundRequest): OutboundResponse
+}
+
+class OutboundApiImpl(
+  private val client: HttpServiceClient
+) : OutboundApi{
+
+  override suspend fun sendSms(request: OutboundRequest): OutboundResponse {
+    return client.post {
+      url("sms/outbound")
+      body(request)
+    }
+  }
+
 }
