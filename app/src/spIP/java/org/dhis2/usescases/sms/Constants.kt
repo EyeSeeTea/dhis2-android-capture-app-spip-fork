@@ -1,3 +1,3 @@
 package org.dhis2.usescases.sms
 
- const val cmoProgram: String = "SdHQreF7gdU"
+const val CMO_PROGRAM: String = "SdHQreF7gdU"

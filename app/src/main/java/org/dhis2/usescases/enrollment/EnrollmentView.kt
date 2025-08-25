@@ -9,19 +9,16 @@ interface EnrollmentView : AbstractActivityContracts.View {
     fun setAccess(access: Boolean?)
 
     fun renderStatus(status: EnrollmentStatus)
-    fun showStatusOptions(currentStatus: EnrollmentStatus)
 
     fun setSaveButtonVisible(visible: Boolean)
 
     fun displayTeiInfo(teiInfo: TeiAttributesInfo)
     fun openEvent(eventUid: String)
-    fun openDashboard(enrollmentUid: String, sendSMS: Boolean)
+    fun openDashboard(enrollmentUid: String?, sendSMS: Boolean = false)
     fun goBack()
     fun setResultAndFinish()
     fun requestFocus()
     fun performSaveClick()
-    fun showProgress()
-    fun hideProgress()
     fun displayTeiPicture(picturePath: String)
-    fun showDateEditionWarning()
+    fun showDateEditionWarning(message: String?)
 }
