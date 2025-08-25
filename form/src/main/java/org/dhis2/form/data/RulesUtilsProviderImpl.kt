@@ -334,7 +334,8 @@ class RulesUtilsProviderImpl(
                     ruleEffect.data
                 }
 
-            ruleEffect.data?.formatData(field.valueType)?.let { formattedValue ->
+            // EyeSeeTea customization: mark field as non-editable when assigned by a rule even value to assign is null
+/*            ruleEffect.data?.formatData(field.valueType)?.let { formattedValue ->
                 val updatedField = fieldViewModels[assign.field()]
                     ?.setValue(formattedValue)
                     ?.setDisplayName(valueToShow?.formatData(field.valueType))
@@ -343,7 +344,29 @@ class RulesUtilsProviderImpl(
                 updatedField?.let {
                     fieldViewModels[fieldUid] = it
                 }
+            }*/
+
+            if ( ruleEffect.data == null)  {
+                    val updatedField = fieldViewModels[assign.field()]
+                        ?.setValue(ruleEffect.data)
+                        ?.setEditable(false)
+
+                    updatedField?.let {
+                        fieldViewModels[fieldUid] = it
+                    }
+            }else {
+                ruleEffect.data?.formatData(field.valueType)?.let { formattedValue ->
+                    val updatedField = fieldViewModels[assign.field()]
+                        ?.setValue(formattedValue)
+                        ?.setDisplayName(valueToShow?.formatData(field.valueType))
+                        ?.setEditable(false)
+
+                    updatedField?.let {
+                        fieldViewModels[fieldUid] = it
+                    }
+                }
             }
+
         } ?: {
             if (!hiddenFields.contains(assign.field())) {
                 valuesToChange[fieldUid] = ruleEffect.data?.formatData()
