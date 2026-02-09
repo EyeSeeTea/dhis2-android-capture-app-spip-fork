@@ -16,13 +16,21 @@ interface Charts {
 
     fun getVisualizationGroups(uid: String?): List<AnalyticsDhisVisualizationsGroup>
 
+    fun existsEnrollmentCharts(enrollmentUid: String): Boolean
+
     fun geEnrollmentCharts(enrollmentUid: String): List<Graph>
 
-    fun getProgramVisualizations(groupUid: String?, programUid: String): List<Graph>
+    fun getProgramVisualizations(
+        groupUid: String?,
+        programUid: String,
+    ): List<Graph>
 
     fun getHomeVisualizations(groupUid: String?): List<Graph>
 
-    fun getDataSetVisualizations(groupUid: String?, dataSetUid: String): List<Graph>
+    fun getDataSetVisualizations(
+        groupUid: String?,
+        dataSetUid: String,
+    ): List<Graph>
 
     fun setVisualizationPeriods(
         visualizationUid: String,
@@ -49,9 +57,13 @@ interface Charts {
 
     interface Dependencies {
         fun getContext(): Context
+
         fun getD2(): D2
+
         fun getFeatureConfigRepository(): FeatureConfigRepository
+
         fun getColorUtils(): ColorUtils
+
         fun getChartDispatcher(): DispatcherProvider
     }
 }
